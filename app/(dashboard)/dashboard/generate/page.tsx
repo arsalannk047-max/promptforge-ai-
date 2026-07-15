@@ -26,6 +26,7 @@ const toolLabels: Record<(typeof aiTools)[number], string> = {
 export default function GeneratePage() {
   const [result, setResult] = useState<StructuredPrompt | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const {
     register,
@@ -83,6 +84,7 @@ export default function GeneratePage() {
         <Card>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* Always visible: the essentials */}
               <div className="space-y-1.5">
                 <Label htmlFor="topic">What is this prompt for?</Label>
                 <Textarea
@@ -117,57 +119,82 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="projectType">Project type</Label>
-                  <Input id="projectType" placeholder="Web app, mobile, API..." {...register("projectType")} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="framework">Framework</Label>
-                  <Input id="framework" placeholder="Next.js, Django..." {...register("framework")} />
-                </div>
-              </div>
+              {/* Toggle for the rest */}
+              <button
+                type="button"
+                onClick={() => setShowAdvanced((v) => !v)}
+                className="flex w-full items-center justify-between rounded-lg border border-forge-800 bg-forge-900/40 px-4 py-2.5 text-sm font-medium text-forge-300 transition hover:border-forge-700 hover:text-forge-100"
+              >
+                <span>{showAdvanced ? "Hide advanced options" : "Show advanced options"}</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  className={`h-4 w-4 transition-transform duration-200 ${showAdvanced ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="programmingLanguage">Language</Label>
-                  <Input id="programmingLanguage" placeholder="TypeScript, Python..." {...register("programmingLanguage")} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="tone">Tone</Label>
-                  <Input id="tone" placeholder="Professional, casual..." {...register("tone")} />
-                </div>
-              </div>
+              {/* Collapsible: everything else */}
+              {showAdvanced && (
+                <div className="space-y-5 border-l-2 border-forge-800 pl-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="projectType">Project type</Label>
+                      <Input id="projectType" placeholder="Web app, mobile, API..." {...register("projectType")} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="framework">Framework</Label>
+                      <Input id="framework" placeholder="Next.js, Django..." {...register("framework")} />
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="difficulty">Difficulty</Label>
-                  <Select id="difficulty" {...register("difficulty")}>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                    <option value="expert">Expert</option>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="outputLength">Output length</Label>
-                  <Select id="outputLength" {...register("outputLength")}>
-                    <option value="short">Short</option>
-                    <option value="medium">Medium</option>
-                    <option value="long">Long</option>
-                  </Select>
-                </div>
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="programmingLanguage">Language</Label>
+                      <Input id="programmingLanguage" placeholder="TypeScript, Python..." {...register("programmingLanguage")} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="tone">Tone</Label>
+                      <Input id="tone" placeholder="Professional, casual..." {...register("tone")} />
+                    </div>
+                  </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="extraRequirements">Extra requirements</Label>
-                <Textarea
-                  id="extraRequirements"
-                  rows={3}
-                  placeholder="Anything else the prompt must account for..."
-                  {...register("extraRequirements")}
-                />
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="difficulty">Difficulty</Label>
+                      <Select id="difficulty" {...register("difficulty")}>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="expert">Expert</option>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="outputLength">Output length</Label>
+                      <Select id="outputLength" {...register("outputLength")}>
+                        <option value="short">Short</option>
+                        <option value="medium">Medium</option>
+                        <option value="long">Long</option>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="extraRequirements">Extra requirements</Label>
+                    <Textarea
+                      id="extraRequirements"
+                      rows={3}
+                      placeholder="Anything else the prompt must account for..."
+                      {...register("extraRequirements")}
+                    />
+                  </div>
+                </div>
+              )}
 
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Forging..." : "Generate prompt"}
