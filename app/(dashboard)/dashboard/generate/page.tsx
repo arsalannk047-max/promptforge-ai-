@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ const toolLabels: Record<(typeof aiTools)[number], string> = {
 };
 
 export default function GeneratePage() {
+  const searchParams = useSearchParams();
   const [result, setResult] = useState<StructuredPrompt | null>(null);
   const [loading, setLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -31,6 +33,7 @@ export default function GeneratePage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<GeneratePromptInput>({
     resolver: zodResolver(generatePromptSchema),
@@ -41,6 +44,11 @@ export default function GeneratePage() {
       promptType: "task",
     },
   });
+
+  useEffect(() => {
+    const topic = searchParams.get("topic");
+    if (topic) setValue("topic", topic);
+  }, [searchParams, setValue]);
 
   async function onSubmit(values: GeneratePromptInput) {
     setLoading(true);
@@ -84,7 +92,6 @@ export default function GeneratePage() {
         <Card>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              {/* Always visible: the essentials */}
               <div className="space-y-1.5">
                 <Label htmlFor="topic">What is this prompt for?</Label>
                 <Textarea
@@ -119,7 +126,6 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              {/* Toggle for the rest */}
               <button
                 type="button"
                 onClick={() => setShowAdvanced((v) => !v)}
@@ -139,7 +145,6 @@ export default function GeneratePage() {
                 </svg>
               </button>
 
-              {/* Collapsible: everything else */}
               {showAdvanced && (
                 <div className="space-y-5 border-l-2 border-forge-800 pl-4">
                   <div className="grid grid-cols-2 gap-4">
