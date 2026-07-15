@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Sidebar } from "@/components/dashboard/sidebar";
-import { Topbar } from "@/components/dashboard/topbar";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import type { Profile } from "@/types/database";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -9,22 +8,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) redirect("/login");
-
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-forge-950">
-      <Sidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar profile={profile as Profile | null} />
-        <main className="flex-1 overflow-y-auto px-6 py-8">{children}</main>
-      </div>
-    </div>
-  );
+  return <DashboardShell profile={profile as Profile | null}>{children}</DashboardShell>;
 }
