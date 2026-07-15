@@ -4,24 +4,33 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/primitives";
 import { Button } from "@/components/ui/button";
 
+const DAILY_GENERATION_LIMIT = 10;
+
 export default async function OverviewPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [{ count: promptCount }, { count: savedCount }, { count: likedCount }, { data: profile }] =
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const [{ count: promptCount }, { count: savedCount }, { count: likedCount }, { data: profile }, { count: todayCount }] =
     await Promise.all([
       supabase.from("prompts").select("id", { count: "exact", head: true }).eq("owner_id", user!.id),
       supabase.from("prompt_bookmarks").select("prompt_id", { count: "exact", head: true }).eq("user_id", user!.id),
       supabase.from("prompt_likes").select("prompt_id", { count: "exact", head: true }).eq("user_id", user!.id),
       supabase.from("profiles").select("*").eq("id", user!.id).single(),
+      supabase
+        .from("generation_history")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .gte("created_at", startOfToday.toISOString()),
     ]);
 
-  const quota = profile?.monthly_generation_quota ?? 20;
-  const used = profile?.prompts_generated_count ?? 0;
+  const quota = DAILY_GENERATION_LIMIT;
+  const used = todayCount ?? 0;
   const pct = Math.min(100, Math.round((used / quota) * 100));
-
   const stats = [
     { label: "Prompts forged", value: promptCount ?? 0, icon: Hammer },
     { label: "Saved", value: savedCount ?? 0, icon: Bookmark },
@@ -43,7 +52,6 @@ export default async function OverviewPage() {
           </Link>
         </Button>
       </div>
-
       <div className="grid gap-5 sm:grid-cols-3">
         {stats.map((s) => (
           <Card key={s.label}>
@@ -59,13 +67,12 @@ export default async function OverviewPage() {
           </Card>
         ))}
       </div>
-
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-forge-200">Monthly generation quota</p>
+            <p className="text-sm font-medium text-forge-200">Daily generation quota</p>
             <p className="text-sm text-forge-400">
-              {used} / {quota} · {profile?.plan || "free"} plan
+              {used} / {quota} today · {profile?.plan || "free"} plan
             </p>
           </div>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-forge-800">
@@ -73,7 +80,7 @@ export default async function OverviewPage() {
           </div>
           {pct >= 80 && (
             <p className="mt-3 text-sm text-warning">
-              You&apos;re close to your monthly limit.{" "}
+              You&apos;re close to today&apos;s limit.{" "}
               <Link href="/dashboard/settings" className="underline">
                 Upgrade to Pro
               </Link>{" "}
