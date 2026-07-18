@@ -17,6 +17,7 @@ import {
   Flame,
   X,
   Volume2,
+  Video,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -26,6 +27,7 @@ const nav = [
   { href: "/dashboard/improve", label: "Improve", icon: Wand2 },
   { href: "/dashboard/convert", label: "Convert", icon: Repeat },
   { href: "/dashboard/voice", label: "Text to Voice", icon: Volume2 },
+  { href: "/dashboard/video", label: "Text to Video", icon: Video },
   { href: "/dashboard/history", label: "History", icon: History },
   { href: "/dashboard/saved", label: "Saved", icon: Bookmark },
   { href: "/dashboard/favorites", label: "Favorites", icon: Heart },
