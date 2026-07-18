@@ -20,7 +20,16 @@ const VOICES = [
 const WIDTH = 720;
 const HEIGHT = 1280;
 
-const WORD_COLORS = ["#f59e0b", "#f43f5e", "#8b5cf6", "#22d3ee", "#4ade80", "#fb923c", "#ec4899", "#38bdf8"];
+const WORD_COLORS: string[] = [
+  "#f59e0b",
+  "#f43f5e",
+  "#8b5cf6",
+  "#22d3ee",
+  "#4ade80",
+  "#fb923c",
+  "#ec4899",
+  "#38bdf8",
+];
 
 export default function VideoPage() {
   const [text, setText] = useState("");
@@ -133,9 +142,10 @@ export default function VideoPage() {
       ctx.shadowBlur = 10;
       ctx.fillText("PromptForge", WIDTH / 2, 80);
 
-      const idx = Math.min(words.length - 1, Math.floor(progress * words.length));
-      const word = words[idx] || "";
-      const color = WORD_COLORS[idx % WORD_COLORS.length];
+      const safeIdx = words.length > 0 ? Math.min(words.length - 1, Math.floor(progress * words.length)) : 0;
+      const word = words[safeIdx] || "";
+      const colorIdx = safeIdx % WORD_COLORS.length;
+      const color: string = WORD_COLORS[colorIdx] || "#f59e0b";
       ctx.fillStyle = color;
       ctx.font = "bold 60px sans-serif";
       ctx.textAlign = "center";
