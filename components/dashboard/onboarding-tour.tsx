@@ -48,8 +48,9 @@ export function OnboardingTour() {
 
   if (!visible) return null;
 
-  const isLast = step === STEPS.length - 1;
-  const current = STEPS[step];
+  const safeStep = Math.min(step, STEPS.length - 1);
+  const isLast = safeStep === STEPS.length - 1;
+  const current = STEPS[safeStep] ?? STEPS[0]!;
   const Icon = current.icon;
 
   return (
@@ -77,14 +78,14 @@ export function OnboardingTour() {
               <span
                 key={i}
                 className={`h-1.5 w-1.5 rounded-full transition ${
-                  i === step ? "w-4 bg-ember-500" : "bg-forge-700"
+                  i === safeStep ? "w-4 bg-ember-500" : "bg-forge-700"
                 }`}
               />
             ))}
           </div>
 
           <div className="flex gap-2">
-            {step > 0 && (
+            {safeStep > 0 && (
               <Button variant="secondary" onClick={() => setStep((s) => s - 1)}>
                 Back
               </Button>
