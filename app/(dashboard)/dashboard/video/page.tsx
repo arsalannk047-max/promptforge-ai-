@@ -20,6 +20,8 @@ const VOICES = [
 const WIDTH = 720;
 const HEIGHT = 1280;
 
+const WORD_COLORS = ["#f59e0b", "#f43f5e", "#8b5cf6", "#22d3ee", "#4ade80", "#fb923c", "#ec4899", "#38bdf8"];
+
 export default function VideoPage() {
   const [text, setText] = useState("");
   const [voice, setVoice] = useState("autumn");
@@ -98,32 +100,49 @@ export default function VideoPage() {
       if (!ctx) return;
       const progress = duration > 0 ? Math.min(1, currentTime / duration) : 0;
 
-      // Background
-      const gradient = ctx.createLinearGradient(0, 0, 0, HEIGHT);
-      gradient.addColorStop(0, "#0b0d10");
-      gradient.addColorStop(1, "#1a1410");
+      const hue = (currentTime * 40) % 360;
+      const gradient = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+      gradient.addColorStop(0, `hsl(${hue}, 70%, 18%)`);
+      gradient.addColorStop(0.5, `hsl(${(hue + 60) % 360}, 65%, 14%)`);
+      gradient.addColorStop(1, `hsl(${(hue + 120) % 360}, 70%, 10%)`);
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      // Progress bar
-      ctx.fillStyle = "rgba(255,255,255,0.1)";
+      ctx.save();
+      ctx.globalAlpha = 0.25;
+      ctx.filter = "blur(60px)";
+      ctx.fillStyle = `hsl(${(hue + 30) % 360}, 90%, 55%)`;
+      ctx.beginPath();
+      ctx.arc(WIDTH * 0.2, HEIGHT * 0.25, 180, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `hsl(${(hue + 200) % 360}, 90%, 55%)`;
+      ctx.beginPath();
+      ctx.arc(WIDTH * 0.8, HEIGHT * 0.75, 200, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.fillStyle = "rgba(255,255,255,0.15)";
       ctx.fillRect(60, HEIGHT - 100, WIDTH - 120, 6);
-      ctx.fillStyle = "#f59e0b";
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(60, HEIGHT - 100, (WIDTH - 120) * progress, 6);
 
-      // Logo mark
-      ctx.fillStyle = "#f59e0b";
+      ctx.fillStyle = "#ffffff";
       ctx.font = "bold 28px sans-serif";
       ctx.textAlign = "center";
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 10;
       ctx.fillText("PromptForge", WIDTH / 2, 80);
 
-      // Caption word
       const idx = Math.min(words.length - 1, Math.floor(progress * words.length));
       const word = words[idx] || "";
-      ctx.fillStyle = "#f5f5f4";
-      ctx.font = "bold 56px sans-serif";
+      const color = WORD_COLORS[idx % WORD_COLORS.length];
+      ctx.fillStyle = color;
+      ctx.font = "bold 60px sans-serif";
       ctx.textAlign = "center";
-      wrapText(ctx, word, WIDTH / 2, HEIGHT / 2, WIDTH - 100, 64);
+      ctx.shadowColor = "rgba(0,0,0,0.6)";
+      ctx.shadowBlur = 20;
+      wrapText(ctx, word, WIDTH / 2, HEIGHT / 2, WIDTH - 100, 68);
+      ctx.shadowBlur = 0;
     }
 
     function wrapText(c: CanvasRenderingContext2D, txt: string, x: number, y: number, maxWidth: number, lineHeight: number) {
@@ -179,7 +198,7 @@ export default function VideoPage() {
       <div className="mb-8">
         <h1 className="font-display text-2xl font-semibold text-forge-50">Text to Video</h1>
         <p className="mt-1 text-sm text-forge-400">
-          Turns your text into a narrated caption video — free, rendered right in your browser.
+          Turns your text into a colorful narrated caption video — free, rendered right in your browser.
         </p>
       </div>
 
