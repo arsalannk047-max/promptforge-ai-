@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         model: "canopylabs/orpheus-v1-english",
         input: text,
         voice,
-        response_format: "mp3",
+        response_format: "wav",
         speed,
       }),
     });
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     const audioBuffer = await groqRes.arrayBuffer();
     return new NextResponse(audioBuffer, {
-      headers: { "Content-Type": "audio/mpeg" },
+      headers: { "Content-Type": "audio/wav" },
     });
   } catch (err) {
     console.error("[voice] failed", err);
