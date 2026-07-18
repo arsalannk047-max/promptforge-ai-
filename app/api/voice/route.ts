@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     if (!groqRes.ok) {
       const errText = await groqRes.text();
       console.error("[voice] groq error", errText);
-      return NextResponse.json({ error: "Voice generation failed. Please try again." }, { status: 502 });
+      return NextResponse.json({ error: `Groq error: ${errText.slice(0, 300)}` }, { status: 502 });
     }
 
     const audioBuffer = await groqRes.arrayBuffer();
