@@ -18,11 +18,13 @@ import {
   X,
   Volume2,
   Video,
+  LayoutTemplate,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 const nav = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard/templates", label: "Templates", icon: LayoutTemplate },
   { href: "/dashboard/generate", label: "Generate", icon: Hammer },
   { href: "/dashboard/improve", label: "Improve", icon: Wand2 },
   { href: "/dashboard/convert", label: "Convert", icon: Repeat },

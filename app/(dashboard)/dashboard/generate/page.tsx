@@ -47,7 +47,17 @@ export default function GeneratePage() {
 
   useEffect(() => {
     const topic = searchParams.get("topic");
+    const framework = searchParams.get("framework");
+    const projectType = searchParams.get("projectType");
     if (topic) setValue("topic", topic);
+    if (framework) {
+      setValue("framework", framework);
+      setShowAdvanced(true);
+    }
+    if (projectType) {
+      setValue("projectType", projectType);
+      setShowAdvanced(true);
+    }
   }, [searchParams, setValue]);
 
   async function onSubmit(values: GeneratePromptInput) {
